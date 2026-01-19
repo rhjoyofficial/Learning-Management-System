@@ -17,6 +17,10 @@ return new class extends Migration
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
             $table->string('certificate_number')->unique();
             $table->timestamp('issued_at')->useCurrent();
+            $table->timestamps();
+
+            $table->unique(['user_id', 'course_id']);
+            $table->index('certificate_number');
         });
     }
 

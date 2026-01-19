@@ -18,7 +18,10 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->string('payment_method');
             $table->string('transaction_id')->unique();
-            $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
+            $table->timestamp('refunded_at')->nullable();
+            $table->float('refund_amount')->nullable();
+            $table->string('refund_reason')->nullable();
+            $table->enum('status', ['pending', 'success', 'failed', 'refunded'])->default('pending');
             $table->timestamps();
         });
     }
