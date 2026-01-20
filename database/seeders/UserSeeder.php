@@ -35,6 +35,18 @@ class UserSeeder extends Seeder
             Role::where('name', 'instructor')->first()
         );
 
+        $fakeStudent = User::firstOrCreate(
+            ['email' => 'student@lms.com'],
+            [
+                'name' => 'Sample Student',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        $fakeStudent->roles()->syncWithoutDetaching(
+            Role::where('name', 'student')->first()
+        );
+
         $students = User::factory()->count(5)->create();
 
         $studentRole = Role::where('name', 'student')->first();

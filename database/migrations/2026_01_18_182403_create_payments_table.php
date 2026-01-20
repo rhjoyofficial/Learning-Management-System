@@ -13,15 +13,27 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+
+            // Relations
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+
+            // Payment info
+            $table->uuid('transaction_id')->unique(); // internal UUID
+            $table->string('gateway'); // bkash, nagad, stripe, etc
+            $table->string('gateway_payment_id')->nullable(); // bKash paymentID
+
             $table->decimal('amount', 10, 2);
-            $table->string('payment_method');
-            $table->string('transaction_id')->unique();
+
+            // Status
+            $table->enum('status', ['pending', 'success', 'failed', 'refunded'])
+                ->default('pending');
+
+            // Refund info
             $table->timestamp('refunded_at')->nullable();
-            $table->float('refund_amount')->nullable();
+            $table->decimal('refund_amount', 10, 2)->nullable();
             $table->string('refund_reason')->nullable();
-            $table->enum('status', ['pending', 'success', 'failed', 'refunded'])->default('pending');
+
             $table->timestamps();
         });
     }
