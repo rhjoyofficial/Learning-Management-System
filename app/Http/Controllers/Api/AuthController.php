@@ -27,6 +27,15 @@ class AuthController extends Controller
 
         // Assign default role
         $studentRole = Role::where('name', 'student')->first();
+
+        if (!$studentRole) {
+            // Clean up created user if role doesn't exist
+            $user->delete();
+            return response()->json([
+                'message' => 'Registration failed: student role not configured.',
+            ], 500);
+        }
+
         $user->roles()->attach($studentRole);
 
         // Ensure single active token
@@ -84,7 +93,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $token = $request->user()->currentAccessToken();
+
+        if ($token) {
+            $token->delete();
+        }
 
         return response()->json([
             'message' => 'Logged out successfully.',
