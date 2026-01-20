@@ -19,6 +19,11 @@ class LessonPolicy
             return false;
         }
 
+        // Check if lesson has an associated module
+        if (!$lesson->module) {
+            return false;
+        }
+
         return $user->enrollments()
             ->where('course_id', $lesson->module->course_id)
             ->whereNull('revoked_at')
