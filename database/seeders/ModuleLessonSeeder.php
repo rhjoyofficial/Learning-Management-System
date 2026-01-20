@@ -13,6 +13,11 @@ class ModuleLessonSeeder extends Seeder
     {
         $course = Course::where('is_paid', true)->first();
 
+        if (!$course) {
+            $this->command->warn('Skipping ModuleLessonSeeder: no paid course found');
+            return;
+        }
+
         $module = Module::create([
             'course_id' => $course->id,
             'title' => 'Getting Started',
