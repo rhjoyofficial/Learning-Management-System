@@ -14,6 +14,11 @@ class ReviewSeeder extends Seeder
         $student = User::whereHas('roles', fn($q) => $q->where('name', 'student'))->first();
         $course = Course::where('is_paid', true)->first();
 
+        if (!$student || !$course) {
+            $this->command->warn('Skipping ReviewSeeder: student or course not found');
+            return;
+        }
+
         Review::firstOrCreate([
             'user_id' => $student->id,
             'course_id' => $course->id,
