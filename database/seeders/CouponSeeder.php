@@ -10,16 +10,35 @@ class CouponSeeder extends Seeder
 {
     public function run(): void
     {
-        $coupon = Coupon::create([
-            'code' => 'WELCOME50',
-            'discount_type' => 'percent',
-            'discount_value' => 50,
-            'usage_limit' => 100,
-            'expires_at' => now()->addDays(30),
-        ]);
+        $paidCourses = Course::where('is_paid', true)->get();
 
-        $coupon->courses()->attach(
-            Course::where('is_paid', true)->pluck('id')
-        );
+        foreach ($paidCourses as $course) {
+            Coupon::create([
+                'code' => strtoupper($course->slug) . '_50',
+                'discount_type' => 'percentage',
+                'discount_value' => 50,
+                'expires_at' => now()->addDays(30),
+                'is_active' => true,
+                'course_id' => $course->id,
+            ]);
+
+            Coupon::create([
+                'code' => strtoupper($course->slug) . '_FREE',
+                'discount_type' => 'free',
+                'discount_value' => null,
+                'expires_at' => now()->addDays(7),
+                'is_active' => true,
+                'course_id' => $course->id,
+            ]);
+
+            Coupon::create([
+                'code' => strtoupper($course->slug) . '_300',
+                'discount_type' => 'fixed',
+                'discount_value' => 300,
+                'expires_at' => null, // no expiry
+                'is_active' => true,
+                'course_id' => $course->id,
+            ]);
+        }
     }
 }

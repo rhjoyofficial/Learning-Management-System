@@ -9,6 +9,7 @@ use App\Services\Bkash\BkashTokenService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use App\Models\CouponUsage;
 
 class BkashCallbackController extends Controller
 {
@@ -45,6 +46,14 @@ class BkashCallbackController extends Controller
             ], [
                 'enrolled_at' => now(),
             ]);
+
+            if ($payment->coupon_id) {
+                CouponUsage::create([
+                    'coupon_id' => $payment->coupon_id,
+                    'user_id' => $payment->user_id,
+                    'used_at' => now(),
+                ]);
+            }
         });
 
         return response()->json(['message' => 'Payment successful']);

@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Student\SSLCommerzCheckoutController;
 use App\Http\Controllers\Api\Webhook\SSLCommerzIPNController;
 use App\Http\Controllers\Api\Student\BkashCheckoutController;
 use App\Http\Controllers\Api\Webhook\BkashCallbackController;
+use App\Http\Controllers\Api\Public\CouponController;
 
 // Public Auth Routes
 Route::prefix('auth')->group(function () {
@@ -92,3 +93,4 @@ Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(fu
 
 Route::post('/payments/bkash/callback', [BkashCallbackController::class, 'handle']);
 
+Route::post('/public/coupons/validate', [CouponController::class, 'validateCoupon']);
