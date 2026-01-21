@@ -13,13 +13,16 @@ class ModuleLessonSeeder extends Seeder
     {
         $courses = Course::all();
 
-        foreach ($courses as $course) {
-            for ($m = 1; $m <= 3; $m++) {
-                $module = Module::create([
-                    'course_id' => $course->id,
-                    'title' => "Module {$m}",
-                    'position' => $m,
-                ]);
+        if (!$course) {
+            $this->command->warn('Skipping ModuleLessonSeeder: no paid course found');
+            return;
+        }
+
+        $module = Module::create([
+            'course_id' => $course->id,
+            'title' => 'Getting Started',
+            'position' => 1,
+        ]);
 
                 for ($l = 1; $l <= 3; $l++) {
                     Lesson::create([

@@ -15,10 +15,22 @@ class CourseSeeder extends Seeder
         $instructor = User::whereHas('roles', fn($q) => $q->where('name', 'instructor'))->first();
         $category = Category::first();
 
-        if (! $instructor || ! $category) {
-            $this->command->warn('Instructor or category missing');
+        if (!$instructor || !$category) {
+            $this->command->warn('Skipping CourseSeeder: instructor or category not found');
             return;
         }
+
+        Course::create([
+            'instructor_id' => $instructor->id,
+            'category_id' => $category->id,
+            'title' => 'Laravel 12 From Scratch',
+            'slug' => Str::slug('Laravel 12 From Scratch'),
+            'description' => 'Complete Laravel 12 learning path.',
+            'price' => 4999,
+            'is_paid' => true,
+            'level' => 'beginner',
+            'status' => 'published',
+        ]);
 
         $courses = [
             ['Laravel 12 From Scratch', 4999, true],
