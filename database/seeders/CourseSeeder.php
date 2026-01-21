@@ -23,7 +23,7 @@ class CourseSeeder extends Seeder
         Course::create([
             'instructor_id' => $instructor->id,
             'category_id' => $category->id,
-            'title' => 'Laravel 12 From Scratch',
+            'title' => 'Laravel 12 From',
             'slug' => Str::slug('Laravel 12 From Scratch'),
             'description' => 'Complete Laravel 12 learning path.',
             'price' => 4999,
@@ -33,7 +33,7 @@ class CourseSeeder extends Seeder
         ]);
 
         $courses = [
-            ['Laravel 12 From Scratch', 4999, true],
+            ['Laravel 12 From Scratch Course', 4999, true],
             ['Advanced Laravel APIs', 3999, true],
             ['Laravel Performance Optimization', 2999, true],
             ['Free Laravel Basics', 0, false],

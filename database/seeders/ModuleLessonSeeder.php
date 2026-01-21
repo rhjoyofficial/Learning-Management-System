@@ -13,27 +13,30 @@ class ModuleLessonSeeder extends Seeder
     {
         $courses = Course::all();
 
-        if (!$course) {
-            $this->command->warn('Skipping ModuleLessonSeeder: no paid course found');
+        if ($courses->isEmpty()) {
+            $this->command->warn('Skipping ModuleLessonSeeder: no courses found');
             return;
         }
 
-        $module = Module::create([
-            'course_id' => $course->id,
-            'title' => 'Getting Started',
-            'position' => 1,
-        ]);
+        foreach ($courses as $course) {
 
-                for ($l = 1; $l <= 3; $l++) {
-                    Lesson::create([
-                        'module_id' => $module->id,
-                        'title' => "Lesson {$m}.{$l}",
-                        'video_url' => "videos/{$course->slug}/module{$m}_lesson{$l}.mp4",
-                        'duration' => rand(300, 900), // 5–15 min
-                        'is_free' => $l === 1, // first lesson free
-                        'position' => $l,
-                    ]);
-                }
+            // Create 1 module (you can increase later)
+            $module = Module::create([
+                'course_id' => $course->id,
+                'title'     => 'Getting Started',
+                'position'  => 1,
+            ]);
+
+            // Create lessons under the module
+            for ($l = 1; $l <= 3; $l++) {
+                Lesson::create([
+                    'module_id' => $module->id,
+                    'title'     => "Lesson 1.{$l}",
+                    'video_url' => "videos/{$course->slug}/module1_lesson{$l}.mp4",
+                    'duration'  => rand(300, 900), // 5–15 minutes
+                    'is_free'   => $l === 1,       // first lesson free
+                    'position'  => $l,
+                ]);
             }
         }
     }
