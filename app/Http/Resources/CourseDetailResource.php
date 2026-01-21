@@ -17,13 +17,17 @@ class CourseDetailResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'slug' => $this->slug,
             'description' => $this->description,
-            'level' => $this->level,
-            'instructor' => $this->whenLoaded('instructor', fn() => $this->instructor->name),
-            'category' => $this->whenLoaded('category', fn() => $this->category->name),
-            'modules' => ModuleResource::collection($this->whenLoaded('modules')),
-            'created_at' => $this->created_at->format('Y-m-d'),
+            'is_paid' => $this->is_paid,
+            'price' => $this->price,
+            'is_enrolled' => auth()->check()
+                ? auth()->user()
+                ->enrollments()
+                ->where('course_id', $this->id)
+                ->whereNull('revoked_at')
+                ->exists()
+                : false,
+            'modules' => ModuleResource::collection($this->modules),
         ];
     }
 }

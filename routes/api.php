@@ -14,6 +14,9 @@ use App\Http\Controllers\Api\Instructor\InstructorCourseController;
 use App\Http\Controllers\Api\Public\CertificateVerificationController;
 use App\Http\Controllers\Api\Student\SSLCommerzCheckoutController;
 use App\Http\Controllers\Api\Webhook\SSLCommerzIPNController;
+use App\Http\Controllers\Api\Student\BkashCheckoutController;
+use App\Http\Controllers\Api\Webhook\BkashCallbackController;
+use App\Http\Controllers\Api\Public\CouponController;
 
 // Public Auth Routes
 Route::prefix('auth')->group(function () {
@@ -78,10 +81,16 @@ Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(fu
 
 Route::post('/payments/webhook', [PaymentWebhookController::class, 'handle']);
 
-Route::middleware(['auth:sanctum', 'role:student'])
-    ->prefix('student')
-    ->group(function () {
-        Route::post('/courses/{course}/checkout', [SSLCommerzCheckoutController::class, 'checkout']);
-    });
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(function () {
+    Route::post('/courses/{course}/checkout', [SSLCommerzCheckoutController::class, 'checkout']);
+});
 
 Route::post('/payments/sslcommerz/ipn', [SSLCommerzIPNController::class, 'handle']);
+
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(function () {
+    Route::post('/courses/{course}/bkash/checkout', [BkashCheckoutController::class, 'checkout']);
+});
+
+Route::post('/payments/bkash/callback', [BkashCallbackController::class, 'handle']);
+
+Route::post('/public/coupons/validate', [CouponController::class, 'validateCoupon']);
