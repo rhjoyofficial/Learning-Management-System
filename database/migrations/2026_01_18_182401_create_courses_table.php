@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description');
+            $table->string('image');
+            $table->string('duration')->nullable();
             $table->decimal('price', 10, 2)->default(0);
             $table->boolean('is_paid')->default(false);
             $table->enum('level', ['beginner', 'intermediate', 'advanced']);

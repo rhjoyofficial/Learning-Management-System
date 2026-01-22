@@ -23,33 +23,38 @@ class CourseSeeder extends Seeder
         Course::create([
             'instructor_id' => $instructor->id,
             'category_id' => $category->id,
-            'title' => 'Laravel 12 From',
-            'slug' => Str::slug('Laravel 12 From Scratch'),
-            'description' => 'Complete Laravel 12 learning path.',
-            'price' => 4999,
+            'title' => '২০ ঘন্টায় কুরআন শেখা —উপহার কোর্স',
+            'slug' => Str::slug('quran20'),
+            'description' => 'কুরআন শেখার ইচ্ছা আছে কিন্তু কোথা থেকে শুরু করবেন বুঝতে পারছেন না? এই কোর্সটি এমনভাবে তৈরি করা হয়েছে যেন যে কেউ, যেকোনো বয়সে, অল্প সময়েই কুরআন পড়ার ভিত্তি গড়ে তুলতে পারেন',
+            'duration' => '২০ দিন',
+            'image' => '/images/quran-course-poster.png',
+            'price' => 6000,
             'is_paid' => true,
-            'level' => 'beginner',
+            'level' => 'advanced',
             'status' => 'published',
         ]);
 
         $courses = [
-            ['Laravel 12 From Scratch Course', 4999, true],
-            ['Advanced Laravel APIs', 3999, true],
-            ['Laravel Performance Optimization', 2999, true],
-            ['Free Laravel Basics', 0, false],
-            ['PHP for Beginners', 0, false],
-            ['OOP in PHP', 1999, true],
-            ['MySQL Masterclass', 1499, true],
-            ['Web Security Essentials', 0, false],
+            ['ট্র্যাকার ভিডিও ট্রেনিং (রেকর্ডেড)', 'দৈনিক অভ্যাস, লক্ষ্য অর্জন ও নিজের অগ্রগতি পর্যবেক্ষণের জন্য একটি সহজ ও কার্যকর ভিডিও ট্রেনিং প্রোগ্রাম।', '/images/tracker.jpg', '১ দিন', 0, false],
+            ['আত্মিক উন্নয়ন কোর্স', 'মানসিক প্রশান্তি, আত্মনিয়ন্ত্রণ ও জীবনের উদ্দেশ্য খুঁজে পেতে একটি ধীর কিন্তু গভীর আত্মিক যাত্রা।', '/images/spiritual-course.jpg', '৮ সপ্তাহ', 3999, true],
+            // ['Laravel Performance Optimization', 'courses/course.jpg', '20 Hr', 2999, true],
+            // ['Free Laravel Basics', 'courses/course.jpg', '20 Hr', 0, false],
+            // ['PHP for Beginners', 'courses/course.jpg', '20 Hr', 0, false],
+            // ['OOP in PHP', 'courses/course.jpg', '20 Hr', 1999, true],
+            // ['MySQL Masterclass', 'courses/course.jpg', '20 Hr', 1499, true],
+            // ['Web Security Essentials', 'courses/course.jpg', '20 Hr', 0, false],
         ];
 
-        foreach ($courses as [$title, $price, $paid]) {
+        foreach ($courses as [$title, $description, $img, $duration, $price, $paid]) {
             Course::create([
                 'instructor_id' => $instructor->id,
                 'category_id' => $category->id,
                 'title' => $title,
+                'description' => $description,
                 'slug' => Str::slug($title),
                 'description' => "Complete course on {$title}.",
+                'image' => $img,
+                'duration' => $duration,
                 'price' => $price,
                 'is_paid' => $paid,
                 'level' => 'beginner',
