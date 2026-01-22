@@ -17,7 +17,8 @@ use App\Http\Controllers\Api\Webhook\SSLCommerzIPNController;
 use App\Http\Controllers\Api\Student\BkashCheckoutController;
 use App\Http\Controllers\Api\Webhook\BkashCallbackController;
 use App\Http\Controllers\Api\Public\CouponController;
-
+use App\Http\Controllers\Api\Student\StudentDashboardController;
+use App\Http\Controllers\Api\Student\StudentCourseController;
 // Public Auth Routes
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -31,8 +32,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     // RBAC Routes
-    Route::middleware('role:student')->prefix('student')->group(function () {
-        Route::get('/dashboard', fn() => response()->json(['m' => 'Student Area']));
+    Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [StudentDashboardController::class, 'index']);
+
+        // Course player
+        Route::get('/courses/{course}', [StudentCourseController::class, 'show']);
+
+        // Watch lesson
+        Route::get('/lessons/{lesson}/watch', [StudentCourseController::class, 'watch']);
     });
 
     Route::middleware('role:instructor')->prefix('instructor')->group(function () {

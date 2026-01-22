@@ -20,23 +20,58 @@ class ModuleLessonSeeder extends Seeder
 
         foreach ($courses as $course) {
 
-            // Create 1 module (you can increase later)
-            $module = Module::create([
-                'course_id' => $course->id,
-                'title'     => 'Getting Started',
-                'position'  => 1,
-            ]);
+            // ===== TRACKER (FREE, 1 DAY) =====
+            if (str_contains(strtolower($course->slug), 'tracker')) {
 
-            // Create lessons under the module
-            for ($l = 1; $l <= 3; $l++) {
+                $module = Module::create([
+                    'course_id' => $course->id,
+                    'title' => 'ট্র্যাকার পরিচিতি',
+                    'position' => 1,
+                ]);
+
                 Lesson::create([
                     'module_id' => $module->id,
-                    'title'     => "Lesson 1.{$l}",
-                    'video_url' => "videos/{$course->slug}/module1_lesson{$l}.mp4",
-                    'duration'  => rand(300, 900), // 5–15 minutes
-                    'is_free'   => $l === 1,       // first lesson free
-                    'position'  => $l,
+                    'title' => 'ট্র্যাকার ব্যবহার নির্দেশনা',
+                    'video_url' => "videos/{$course->slug}/lesson1.mp4",
+                    'duration' => 600, // 10 min
+                    'is_free' => true,
+                    'position' => 1,
                 ]);
+
+                continue;
+            }
+
+            // ===== PAID / REGULAR COURSES =====
+
+            $modules = [
+                'কোর্স পরিচিতি',
+                'মৌলিক ধারণা',
+                'ব্যবহারিক অনুশীলন',
+                'উন্নত কৌশল',
+            ];
+
+            $modulePosition = 1;
+
+            foreach ($modules as $moduleTitle) {
+                $module = Module::create([
+                    'course_id' => $course->id,
+                    'title' => $moduleTitle,
+                    'position' => $modulePosition,
+                ]);
+
+                // 5 lessons per module
+                for ($l = 1; $l <= 20; $l++) {
+                    Lesson::create([
+                        'module_id' => $module->id,
+                        'title' => "{$moduleTitle} - পাঠ {$l}",
+                        'video_url' => "videos/{$course->slug}/module{$modulePosition}_lesson{$l}.mp4",
+                        'duration' => rand(600, 1200), // 10–20 min
+                        'is_free' => ($modulePosition === 1 && $l === 1),
+                        'position' => $l,
+                    ]);
+                }
+
+                $modulePosition++;
             }
         }
     }

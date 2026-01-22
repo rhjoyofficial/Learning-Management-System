@@ -13,7 +13,9 @@ class CourseController extends Controller
     {
         $query = Course::query()
             ->where('status', 'published')
-            ->with(['category:id,name', 'instructor:id,name']);
+            ->with(['category:id,name', 'instructor:id,name'])
+            ->withCount('modules')
+            ->withCount('enrollments');
 
         if ($request->filled('category')) {
             $query->whereHas(
@@ -44,10 +46,11 @@ class CourseController extends Controller
     {
         $course = Course::where('slug', $slug)
             ->where('status', 'published')
+            ->withCount('modules')
+            ->withCount('enrollments')
             ->with(['instructor', 'category', 'modules.lessons'])
             ->firstOrFail();
-
-        // The Resource handles all the unsetting and formatting!
+            
         return new CourseDetailResource($course);
     }
 }
