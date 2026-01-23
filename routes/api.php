@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Course player
         Route::get('/courses/{course}', [StudentCourseController::class, 'show']);
+        Route::get('/courses/{course}/resume', [StudentCourseController::class, 'resume']);
 
         // Watch lesson
         Route::get('/lessons/{lesson}/watch', [StudentCourseController::class, 'watch']);
