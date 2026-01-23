@@ -48,7 +48,7 @@ class StudentCourseController extends Controller
                             'title' => $lesson->title,
                             'is_free' => $lesson->is_free,
                             'is_completed' => (bool) $progress?->completed_at,
-                            'is_locked' => ! $lesson->is_free && ! $progress,
+                            'is_locked' => false, // <-- key change
                         ];
                     }),
                 ];
@@ -74,6 +74,40 @@ class StudentCourseController extends Controller
                 'video_url' => $lesson->video_url,
                 'duration' => $lesson->duration,
             ],
+        ]);
+    }
+
+    public function resume(Request $request, Course $course)
+    {
+        $user = $request->user();
+
+        if (! $user->isEnrolledIn($course)) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Last watched lesson
+        $lastProgress = $user->lessonProgress()
+            ->whereHas(
+                'lesson.module',
+                fn($q) =>
+                $q->where('course_id', $course->id)
+            )
+            ->latest('updated_at')
+            ->first();
+
+        if ($lastProgress) {
+            return response()->json([
+                'lesson_id' => $lastProgress->lesson_id,
+            ]);
+        }
+
+        // Fallback: first unlocked lesson
+        $lesson = $course->modules()
+            ->with(['lessons' => fn($q) => $q->where('is_free', true)])
+            ->first()?->lessons->first();
+
+        return response()->json([
+            'lesson_id' => $lesson?->id,
         ]);
     }
 }
