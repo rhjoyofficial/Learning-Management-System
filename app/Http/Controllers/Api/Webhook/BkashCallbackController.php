@@ -40,14 +40,15 @@ class BkashCallbackController extends Controller
         DB::transaction(function () use ($payment) {
             $payment->update(['status' => 'success']);
 
-            Enrollment::firstOrCreate([
+            $enrollment = Enrollment::firstOrCreate([
                 'user_id' => $payment->user_id,
                 'course_id' => $payment->course_id,
             ], [
                 'enrolled_at' => now(),
             ]);
 
-            if ($payment->coupon_id) {
+            // Only create coupon usage if enrollment was just created
+            if ($payment->coupon_id && $enrollment->wasRecentlyCreated) {
                 CouponUsage::create([
                     'coupon_id' => $payment->coupon_id,
                     'user_id' => $payment->user_id,

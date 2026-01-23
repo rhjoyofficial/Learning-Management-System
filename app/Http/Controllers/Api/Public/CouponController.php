@@ -19,7 +19,7 @@ class CouponController extends Controller
         $course = Course::findOrFail($data['course_id']);
 
         return response()->json(
-            $couponService->validateCoupon($data['code'], $course)
+            $couponService->validateCoupon($data['code'], $course, $request->user())
         );
     }
 }

@@ -17,11 +17,14 @@ class Enrollment extends Model
         'course_id',
         'enrolled_at',
         'completed_at',
+        'revoked_at',
+        'revocation_reason',
     ];
 
     protected $casts = [
         'enrolled_at' => 'datetime',
         'completed_at' => 'datetime',
+        'revoked_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

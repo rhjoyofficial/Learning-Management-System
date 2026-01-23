@@ -4,13 +4,13 @@ namespace App\Services;
 
 use App\Models\Coupon;
 use App\Models\Course;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Models\CouponUsage;
-use Illuminate\Support\Facades\Auth;
 
 class CouponService
 {
-    public function validateCoupon(string $code, Course $course): array
+    public function validateCoupon(string $code, Course $course, ?User $user = null): array
     {
         $coupon = Coupon::where('code', $code)
             ->where('course_id', $course->id)
@@ -32,9 +32,9 @@ class CouponService
         }
 
         // 🔒 One-time use per user
-        if (Auth::check()) {
+        if ($user) {
             $alreadyUsed = CouponUsage::where('coupon_id', $coupon->id)
-                ->where('user_id', Auth::id())
+                ->where('user_id', $user->id)
                 ->exists();
 
             if ($alreadyUsed) {
@@ -47,7 +47,7 @@ class CouponService
 
         $discount = match ($coupon->discount_type) {
             'free' => $course->price,
-            'percentage' => round(($course->price * $coupon->discount_value) / 100),
+            'percentage' => round(($course->price * $coupon->discount_value) / 100, 2),
             'fixed' => min($coupon->discount_value, $course->price),
             default => 0,
         };

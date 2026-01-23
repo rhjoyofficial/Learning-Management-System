@@ -73,7 +73,10 @@ class User extends Authenticatable
 
     public function isEnrolledIn(Course $course): bool
     {
-        return $this->enrollments()->where('course_id', $course->id)->exists();
+        return $this->enrollments()
+            ->where('course_id', $course->id)
+            ->whereNull('revoked_at')
+            ->exists();
     }
 
     public function payments(): HasMany
@@ -105,8 +108,13 @@ class User extends Authenticatable
        Helpers
     ========================== */
 
+    protected $roleCache = null;
+
     public function hasRole(string $role): bool
     {
-        return $this->roles()->where('name', $role)->exists();
+        if ($this->roleCache === null) {
+            $this->roleCache = $this->roles->pluck('name')->toArray();
+        }
+        return in_array($role, $this->roleCache, true);
     }
 }

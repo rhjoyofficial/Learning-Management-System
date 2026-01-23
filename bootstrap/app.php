@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'verify.bkash.signature' => \App\Http\Middleware\VerifyBkashSignature::class,
+            'verify.webhook.signature' => \App\Http\Middleware\VerifyPaymentWebhookSignature::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

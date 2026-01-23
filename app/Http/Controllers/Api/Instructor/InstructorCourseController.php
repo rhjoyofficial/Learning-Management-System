@@ -47,8 +47,18 @@ class InstructorCourseController extends Controller
         $data['instructor_id'] = $request->user()->id;
         $data['is_paid'] = ($data['price'] ?? 0) > 0;
         $data['status'] = 'draft';
-        $data['slug'] = Str::slug($data['title']);
-        
+
+        // Generate unique slug
+        $baseSlug = Str::slug($data['title']);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (Course::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter++;
+        }
+
+        $data['slug'] = $slug;
+
         $course = Course::create($data);
 
         return response()->json([
@@ -64,6 +74,7 @@ class InstructorCourseController extends Controller
         $data = $request->validate([
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
+            'category_id' => 'sometimes|exists:categories,id',
             'price' => 'nullable|numeric|min:0',
             'level' => 'sometimes|in:beginner,intermediate,advanced',
             'status' => 'sometimes|in:draft,published',

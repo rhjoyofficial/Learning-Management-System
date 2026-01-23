@@ -16,7 +16,11 @@ class RoleMiddleware
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
-        if (!$user->roles()->whereIn('name', $roles)->exists()) {
+        // Eager load roles once to avoid N+1 queries
+        $user->loadMissing('roles');
+        $userRoles = $user->roles->pluck('name')->toArray();
+
+        if (!array_intersect($roles, $userRoles)) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 

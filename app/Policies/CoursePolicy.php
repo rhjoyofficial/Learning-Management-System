@@ -9,22 +9,13 @@ class CoursePolicy
 {
     public function view(?User $user, Course $course): bool
     {
-        if ($course->status !== 'published') {
-            return false;
+        if ($course->status === 'published') {
+            return true;
         }
 
-        return true;
+        // Allow the owner or admin to see drafts
+        return $user && ($user->id === $course->instructor_id || $user->hasRole('admin'));
     }
-
-    // public function view(?User $user, Course $course): bool
-    // {
-    //     if ($course->status === 'published') {
-    //         return true;
-    //     }
-
-    //     // Allow the owner or admin to see drafts
-    //     return $user && ($user->id === $course->instructor_id || $user->hasRole('admin'));
-    // }
 
     public function create(User $user): bool
     {

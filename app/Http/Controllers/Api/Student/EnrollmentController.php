@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Enrollment;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class EnrollmentController extends Controller
 {
@@ -22,25 +23,29 @@ class EnrollmentController extends Controller
             return response()->json(['message' => 'Course is not available for enrollment.'], 403);
         }
 
-        // Prevent duplicate enrollment
-        if (Enrollment::where('user_id', $request->user()->id)->where('course_id', $course->id)->exists()) {
-            return response()->json(['message' => 'Already enrolled in this course.'], 409);
-        }
-
         // TEMP RULE: only free courses can be enrolled manually
         if ($course->is_paid) {
             return response()->json(['message' => 'This course requires payment.'], 403);
         }
 
-        $enrollment = Enrollment::create([
-            'user_id' => $request->user()->id,
-            'course_id' => $course->id,
-            'enrolled_at' => now(),
-        ]);
+        // Use try-catch to handle race condition with unique constraint
+        try {
+            $enrollment = Enrollment::create([
+                'user_id' => $request->user()->id,
+                'course_id' => $course->id,
+                'enrolled_at' => now(),
+            ]);
 
-        return response()->json([
-            'message' => 'Enrollment successful.',
-            'data' => $enrollment
-        ], 201);
+            return response()->json([
+                'message' => 'Enrollment successful.',
+                'data' => $enrollment
+            ], 201);
+        } catch (QueryException $e) {
+            // Check if it's a duplicate entry error (SQLSTATE 23000)
+            if ($e->getCode() === '23000') {
+                return response()->json(['message' => 'Already enrolled in this course.'], 409);
+            }
+            throw $e;
+        }
     }
 }

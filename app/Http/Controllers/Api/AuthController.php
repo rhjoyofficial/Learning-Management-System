@@ -23,6 +23,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'status' => 'active',
         ]);
 
         // Assign default role
@@ -66,6 +67,13 @@ class AuthController extends Controller
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials.'],
+            ]);
+        }
+
+        // Check user status
+        if ($user->status !== 'active') {
+            throw ValidationException::withMessages([
+                'email' => ['Your account has been suspended. Please contact support.'],
             ]);
         }
 

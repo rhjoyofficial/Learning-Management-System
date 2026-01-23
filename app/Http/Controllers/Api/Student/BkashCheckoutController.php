@@ -32,7 +32,8 @@ class BkashCheckoutController extends Controller
         if ($request->filled('coupon_code')) {
             $couponData = $couponService->validateCoupon(
                 $request->coupon_code,
-                $course
+                $course,
+                $request->user()
             );
 
             if (! $couponData['valid']) {
@@ -53,19 +54,29 @@ class BkashCheckoutController extends Controller
          * 3️⃣ If 100% discount → auto enroll (NO PAYMENT)
          */
         if ($finalAmount == 0) {
-            Enrollment::firstOrCreate([
-                'user_id' => $request->user()->id,
-                'course_id' => $course->id,
-            ]);
+            $enrollment = Enrollment::firstOrCreate(
+                [
+                    'user_id' => $request->user()->id,
+                    'course_id' => $course->id,
+                ],
+                [
+                    'enrolled_at' => now(),
+                ]
+            );
 
-            CouponUsage::create([
-                'coupon_id' => $couponData['coupon_id'],
-                'user_id' => $request->user()->id,
-                'used_at' => now(),
-            ]);
+            // Only create coupon usage if enrollment was just created
+            if ($enrollment->wasRecentlyCreated && isset($couponData['coupon_id'])) {
+                CouponUsage::create([
+                    'coupon_id' => $couponData['coupon_id'],
+                    'user_id' => $request->user()->id,
+                    'used_at' => now(),
+                ]);
+            }
 
             return response()->json([
-                'message' => 'Enrolled successfully using coupon',
+                'message' => $enrollment->wasRecentlyCreated
+                    ? 'Enrolled successfully using coupon'
+                    : 'Already enrolled in this course',
             ]);
         }
 
@@ -87,28 +98,45 @@ class BkashCheckoutController extends Controller
         /**
          * 5️⃣ Create bKash checkout session
          */
-        $token = $bkash->getToken();
+        try {
+            $token = $bkash->getToken();
 
-        $response = Http::withToken($token)->post(
-            config('services.bkash.base_url') .
-                '/v1.2.0-beta/tokenized/checkout/create',
-            [
-                'mode' => '0011',
-                'payerReference' => $request->user()->email,
-                'callbackURL' => url(config('services.bkash.callback_url')),
-                'amount' => $payment->amount,
-                'currency' => 'BDT',
-                'intent' => 'sale',
-                'merchantInvoiceNumber' => $payment->transaction_id,
-            ]
-        );
+            $response = Http::timeout(10)
+                ->withToken($token)
+                ->post(
+                    config('services.bkash.base_url') .
+                        '/v1.2.0-beta/tokenized/checkout/create',
+                    [
+                        'mode' => '0011',
+                        'payerReference' => $request->user()->email,
+                        'callbackURL' => url(config('services.bkash.callback_url')),
+                        'amount' => $payment->amount,
+                        'currency' => 'BDT',
+                        'intent' => 'sale',
+                        'merchantInvoiceNumber' => $payment->transaction_id,
+                    ]
+                );
 
-        $data = $response->json();
+            if (! $response->successful()) {
+                throw new \Exception('bKash API returned ' . $response->status());
+            }
 
-        if (! isset($data['paymentID'])) {
+            $data = $response->json();
+
+            if (! isset($data['paymentID'])) {
+                throw new \Exception('Missing paymentID in bKash response');
+            }
+        } catch (\Exception $e) {
+            \Log::error('bKash checkout failed', [
+                'error' => $e->getMessage(),
+                'user_id' => $request->user()->id,
+                'course_id' => $course->id,
+                'payment_id' => $payment->id,
+            ]);
+
             return response()->json([
-                'message' => 'bKash initialization failed',
-            ], 500);
+                'message' => 'Payment gateway temporarily unavailable. Please try again.',
+            ], 503);
         }
 
         /**

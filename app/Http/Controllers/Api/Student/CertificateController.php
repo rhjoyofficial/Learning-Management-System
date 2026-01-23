@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Certificate;
 use App\Models\CourseProgress;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -43,8 +44,13 @@ class CertificateController extends Controller
             return response()->json(['data' => $existing]);
         }
 
-        // Create certificate atomically
+        // Create certificate atomically and mark enrollment as completed
         $certificate = DB::transaction(function () use ($request, $course) {
+            // Update enrollment as completed
+            Enrollment::where('user_id', $request->user()->id)
+                ->where('course_id', $course->id)
+                ->update(['completed_at' => now()]);
+
             return Certificate::create([
                 'user_id' => $request->user()->id,
                 'course_id' => $course->id,
@@ -58,21 +64,35 @@ class CertificateController extends Controller
 
     public function show(Request $request, Course $course)
     {
-        $certificate = Certificate::where('user_id', $request->user()->id)
+        $certificate = Certificate::with(['user:id,name', 'course:id,title'])
+            ->where('user_id', $request->user()->id)
             ->where('course_id', $course->id)
             ->firstOrFail();
 
-        return response()->json(['data' => $certificate]);
+        return response()->json([
+            'data' => [
+                'id' => $certificate->id,
+                'certificate_number' => $certificate->certificate_number,
+                'issued_at' => $certificate->issued_at,
+                'user_name' => $certificate->user->name,
+                'course_title' => $certificate->course->title,
+            ]
+        ]);
     }
 
     protected function generateNumber(int $courseId, int $userId): string
     {
-        return sprintf(
-            'LMS-%d-%d-%s-%s',
-            $courseId,
-            $userId,
-            now()->format('Ymd'),
-            Str::upper(Str::random(6))
-        );
+        // Generate unique certificate number with collision prevention
+        do {
+            $number = sprintf(
+                'LMS-%d-%d-%s-%s',
+                $courseId,
+                $userId,
+                now()->format('Ymd'),
+                Str::upper(Str::random(8))
+            );
+        } while (Certificate::where('certificate_number', $number)->exists());
+
+        return $number;
     }
 }

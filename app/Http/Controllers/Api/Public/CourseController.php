@@ -34,7 +34,9 @@ class CourseController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', "%{$request->search}%");
+            // Escape LIKE wildcards to prevent manipulation
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
+            $query->where('title', 'like', "%{$search}%");
         }
 
         $courses = $query->paginate(10);

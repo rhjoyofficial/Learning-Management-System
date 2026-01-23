@@ -18,8 +18,6 @@ class Certificate extends Model
         'issued_at' => 'datetime',
     ];
 
-    protected $appends = ['user_name', 'course_title'];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -28,15 +26,5 @@ class Certificate extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
-    }
-
-    public function getUserNameAttribute(): string
-    {
-        return $this->user->name ?? 'Unknown';
-    }
-
-    public function getCourseTitleAttribute(): string
-    {
-        return $this->course->title ?? 'Unknown Course';
     }
 }
