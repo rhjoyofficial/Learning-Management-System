@@ -3,15 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Certificate extends Model
 {
-    use HasFactory;
-
-    public $timestamps = false;
-
     protected $fillable = [
         'user_id',
         'course_id',
@@ -23,6 +18,8 @@ class Certificate extends Model
         'issued_at' => 'datetime',
     ];
 
+    protected $appends = ['user_name', 'course_title'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -31,5 +28,15 @@ class Certificate extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function getUserNameAttribute(): string
+    {
+        return $this->user->name ?? 'Unknown';
+    }
+
+    public function getCourseTitleAttribute(): string
+    {
+        return $this->course->title ?? 'Unknown Course';
     }
 }

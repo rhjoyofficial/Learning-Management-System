@@ -17,6 +17,7 @@ class LessonProgress extends Model
         'lesson_id',
         'is_completed',
         'watched_duration',
+        'last_watched_at',
     ];
 
     protected $casts = [

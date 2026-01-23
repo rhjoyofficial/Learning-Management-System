@@ -32,7 +32,7 @@ class ModuleLessonSeeder extends Seeder
                 Lesson::create([
                     'module_id' => $module->id,
                     'title' => 'ট্র্যাকার ব্যবহার নির্দেশনা',
-                    'video_url' => "https://www.youtube.com/embed/d1eTANKU-iw?si=l1J8NlECnBOJrxoL",
+                    'video_url' => "https://www.youtube.com/embed/WeFDX19xGWQ?si=64-rUWt0KaFStZ6u",
                     'duration' => 600, // 10 min
                     'is_free' => true,
                     'position' => 1,
@@ -64,7 +64,7 @@ class ModuleLessonSeeder extends Seeder
                     Lesson::create([
                         'module_id' => $module->id,
                         'title' => "{$moduleTitle} - পাঠ {$l}",
-                        'video_url' => "https://www.youtube.com/embed/d1eTANKU-iw?si=l1J8NlECnBOJrxoL",
+                        'video_url' => "https://www.youtube.com/embed/WeFDX19xGWQ?si=64-rUWt0KaFStZ6u",
                         'duration' => rand(600, 1200), // 10–20 min
                         'is_free' => ($modulePosition === 1 && $l === 1),
                         'position' => $l,

@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('lesson_progress', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('lesson_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('lesson_id')->constrained()->onDelete('cascade');
+            $table->integer('watched_duration')->default(0); // in seconds
             $table->boolean('is_completed')->default(false);
-            $table->unsignedInteger('watched_duration')->default(0);
-            $table->unsignedInteger('watch_time_seconds')->default(0);
-            $table->timestamp('completed_at')->nullable();
+            $table->timestamp('last_watched_at')->nullable();
             $table->timestamps();
+
             $table->unique(['user_id', 'lesson_id']);
         });
     }
