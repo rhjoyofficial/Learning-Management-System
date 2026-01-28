@@ -22,6 +22,7 @@ class CourseDetailResource extends JsonResource
             'image' => $this->image,
             'is_paid' => $this->is_paid,
             'price' => $this->price,
+            'offerPrice' => $this->offer_price,
             'duration' => $this->duration,
             'modules_count' => $this->modules_count,
             'enrollments_count' => $this->enrollments_count,

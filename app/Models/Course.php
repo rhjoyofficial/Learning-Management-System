@@ -21,6 +21,7 @@ class Course extends Model
         'image',
         'duration',
         'price',
+        'offer_price',
         'is_paid',
         'level',
         'thumbnail',
@@ -30,6 +31,7 @@ class Course extends Model
     protected $casts = [
         'is_paid' => 'boolean',
         'price' => 'decimal:2',
+        'offer_price' => 'decimal:2',
     ];
 
     public function instructor(): BelongsTo

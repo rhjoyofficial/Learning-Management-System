@@ -45,6 +45,15 @@ class CouponService
             }
         }
 
+        // $basePrice = $course->offer_price > 0 ? $course->offer_price : $course->price;
+
+        // $discount = match ($coupon->discount_type) {
+        //     'free' => $basePrice,
+        //     'percentage' => round(($basePrice * $coupon->discount_value) / 100),
+        //     'fixed' => min($coupon->discount_value, $basePrice),
+        //     default => 0,
+        // };
+
         $discount = match ($coupon->discount_type) {
             'free' => $course->price,
             'percentage' => round(($course->price * $coupon->discount_value) / 100),

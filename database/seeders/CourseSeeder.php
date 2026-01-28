@@ -28,14 +28,15 @@ class CourseSeeder extends Seeder
             'description' => 'কুরআন শেখার ইচ্ছা আছে কিন্তু কোথা থেকে শুরু করবেন বুঝতে পারছেন না? এই কোর্সটি এমনভাবে তৈরি করা হয়েছে যেন যে কেউ, যেকোনো বয়সে, অল্প সময়েই কুরআন পড়ার ভিত্তি গড়ে তুলতে পারেন',
             'duration' => '২০ দিন',
             'image' => '/images/quran-course-poster.png',
-            'price' => 6000,
+            'price' => 12000,
+            'offer_price' => 6000,
             'is_paid' => true,
             'level' => 'advanced',
             'status' => 'published',
         ]);
 
         $courses = [
-            ['ট্র্যাকার ভিডিও ট্রেনিং (রেকর্ডেড)', 'দৈনিক অভ্যাস, লক্ষ্য অর্জন ও নিজের অগ্রগতি পর্যবেক্ষণের জন্য একটি সহজ ও কার্যকর ভিডিও ট্রেনিং প্রোগ্রাম।', '/images/tracker.jpg', '১ দিন', 0, false],
+            ['ট্র্যাকার ভিডিও ট্রেনিং (রেকর্ডেড)', 'দৈনিক অভ্যাস, লক্ষ্য অর্জন ও নিজের অগ্রগতি পর্যবেক্ষণের জন্য একটি সহজ ও কার্যকর ভিডিও ট্রেনিং প্রোগ্রাম।', '/images/tracker-video.png', '১ দিন', 0, false],
             ['আত্মিক উন্নয়ন কোর্স', 'মানসিক প্রশান্তি, আত্মনিয়ন্ত্রণ ও জীবনের উদ্দেশ্য খুঁজে পেতে একটি ধীর কিন্তু গভীর আত্মিক যাত্রা।', '/images/spiritual-course.jpg', '৮ সপ্তাহ', 3999, true],
             // ['Laravel Performance Optimization', 'courses/course.jpg', '20 Hr', 2999, true],
             // ['Free Laravel Basics', 'courses/course.jpg', '20 Hr', 0, false],
