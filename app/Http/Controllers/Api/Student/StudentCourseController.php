@@ -20,12 +20,22 @@ class StudentCourseController extends Controller
             ], 403);
         }
 
+        // Ensure course is accessible by time window
+        if (! $course->isAccessibleNow()) {
+            return response()->json([
+                'message' => 'This course is not accessible at this time.',
+                'start_at' => $course->start_at,
+                'end_at' => $course->end_at,
+            ], 403);
+        }
+
         $course->load([
             'modules.lessons' => function ($q) {
                 $q->orderBy('position');
             },
             'instructor:id,name',
         ]);
+        $isCourseAccessible = $course->isAccessibleNow();
 
         return response()->json([
             'course' => [
@@ -34,11 +44,11 @@ class StudentCourseController extends Controller
                 'description' => $course->description,
                 'instructor' => $course->instructor->name,
             ],
-            'modules' => $course->modules->map(function ($module) use ($user) {
+            'modules' => $course->modules->map(function ($module) use ($user, $isCourseAccessible) {
                 return [
                     'id' => $module->id,
                     'title' => $module->title,
-                    'lessons' => $module->lessons->map(function ($lesson) use ($user) {
+                    'lessons' => $module->lessons->map(function ($lesson) use ($user, $isCourseAccessible) {
                         $progress = $user->lessonProgress()
                             ->where('lesson_id', $lesson->id)
                             ->first();
@@ -48,7 +58,7 @@ class StudentCourseController extends Controller
                             'title' => $lesson->title,
                             'is_free' => $lesson->is_free,
                             'is_completed' => (bool) $progress?->completed_at,
-                            'is_locked' => false, // <-- key change
+                            'is_locked' => ! $isCourseAccessible,
                         ];
                     }),
                 ];

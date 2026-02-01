@@ -26,8 +26,8 @@ class CourseDetailResource extends JsonResource
             'duration' => $this->duration,
             'modules_count' => $this->modules_count,
             'enrollments_count' => $this->enrollments_count,
-            'is_enrolled' => auth()->check()
-                ? auth()->user()
+            'has_demo_video' => $this->hasDemoVideo(),
+            'is_enrolled' => auth()->check() ? auth()->user()
                 ->enrollments()
                 ->where('course_id', $this->id)
                 ->whereNull('revoked_at')
