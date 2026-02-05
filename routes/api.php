@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\Webhook\BkashCallbackController;
 use App\Http\Controllers\Api\Public\CouponController;
 use App\Http\Controllers\Api\Student\StudentDashboardController;
 use App\Http\Controllers\Api\Student\StudentCourseController;
+
 // Public Auth Routes
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);

@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::table('courses', function (Blueprint $table) {
             $table->string('demo_video_url')->nullable()->after('thumbnail');
+            $table->string('promo_text')->nullable()->after('demo_video_url');
 
             $table->timestamp('start_at')->nullable()->after('status');
             $table->timestamp('end_at')->nullable()->after('start_at');
