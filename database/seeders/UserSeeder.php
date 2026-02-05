@@ -24,19 +24,49 @@ class UserSeeder extends Seeder
             $admin->roles()->syncWithoutDetaching($adminRole);
         }
 
-        $instructor = User::firstOrCreate(
-            ['email' => 'instructor@lms.com'],
+
+        $instructors = [
             [
+                'email' => 'instructor1@lms.com',
                 'name' => 'প্রশিক্ষক শাইখ জিয়াউল হাসান আযহারী',
-                'bio' => 'শাইখ জিয়াউল হাসান আযহারী মিশরের আল-আযহার বিশ্ববিদ্যালয় থেকে শিক্ষিত একজন জনপ্রিয় ইসলামি আলোচক. তিনি বাংলাদেশের একজন প্রখ্যাত ইসলামি চিন্তাবিদ এবং বক্তা।',
+                'bio' => 'শাইখ জিয়াউল হাসান আযহারী মিশরের আল-আযহার বিশ্ববিদ্যালয় থেকে শিক্ষিত একজন জনপ্রিয় ইসলামি আলোচক।',
+                'avatar' => '/images/shaikh-jiaul-hasan-azhari.png',
+            ],
+            [
+                'email' => 'cmmoin@gmail.com',
+                'name' => 'চৌধুরী মোহাম্মদ মঈন',
+                'bio' => 'একজন ক্লিনিক্যাল সার্টিফাইড নিউট্রিশনিস্ট, মোটিভেশনাল স্পিকার , ব্যবসায়ী , প্রতিষ্ঠাতা,  শিক্ষক, কনটেন্ট ক্রিয়েটর, গ্রোথ মেন্টর ।',
+                'avatar' => '/images/cmmoin.png',
+            ],
+            [
+                'email' => 'instructor3@lms.com',
+                'name' => 'ড. মিজানুর রহমান আজহারী',
+                'bio' => 'আন্তর্জাতিক খ্যাতিসম্পন্ন ইসলামি চিন্তাবিদ এবং গবেষক। তিনি আধুনিক প্রেক্ষাপটে ইসলামি আলোচনার জন্য পরিচিত।',
+            ],
+            [
+                'email' => 'instructor4@lms.com',
+                'name' => 'শাইখ আবু বকর মুহাম্মদ যাকারিয়া',
+                'bio' => 'বিশিষ্ট ইসলামি স্কলার এবং গবেষক, যিনি মদীনা ইসলামী বিশ্ববিদ্যালয় থেকে উচ্চশিক্ষা সম্পন্ন করেছেন।',
                 'avatar' => '/images/user-avatar.png',
-                'password' => Hash::make('password'),
-            ]
-        );
+            ],
+        ];
 
         $instructorRole = Role::where('name', 'instructor')->first();
-        if ($instructorRole) {
-            $instructor->roles()->syncWithoutDetaching($instructorRole);
+
+        foreach ($instructors as $data) {
+            $user = User::firstOrCreate(
+                ['email' => $data['email']],
+                [
+                    'name'     => $data['name'],
+                    'bio'      => $data['bio'],
+                    'avatar'   => $data['avatar'] ?? '/images/default-avatar.png', // Fallback avatar
+                    'password' => Hash::make('password'),
+                ]
+            );
+
+            if ($instructorRole) {
+                $user->roles()->syncWithoutDetaching($instructorRole);
+            }
         }
 
         $studentsData = [

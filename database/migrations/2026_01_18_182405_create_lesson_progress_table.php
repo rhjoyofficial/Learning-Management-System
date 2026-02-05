@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('lesson_id')->constrained()->cascadeOnDelete();
             $table->boolean('is_completed')->default(false);
             $table->unsignedInteger('watched_duration')->default(0);
+            $table->unsignedInteger('watch_time_seconds')->default(0);
+            $table->timestamp('completed_at')->nullable();
             $table->timestamps();
             $table->unique(['user_id', 'lesson_id']);
         });

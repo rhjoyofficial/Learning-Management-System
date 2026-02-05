@@ -50,7 +50,7 @@ class CourseController extends Controller
             ->withCount('enrollments')
             ->with(['instructor', 'category', 'modules.lessons'])
             ->firstOrFail();
-            
+
         return new CourseDetailResource($course);
     }
 }

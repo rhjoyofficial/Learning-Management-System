@@ -22,11 +22,13 @@ class CourseDetailResource extends JsonResource
             'image' => $this->image,
             'is_paid' => $this->is_paid,
             'price' => $this->price,
+            'offerPrice' => $this->offer_price,
             'duration' => $this->duration,
             'modules_count' => $this->modules_count,
             'enrollments_count' => $this->enrollments_count,
-            'is_enrolled' => auth()->check()
-                ? auth()->user()
+            'has_demo_video' => $this->hasDemoVideo(),
+            'demo_video_url' => $this->demo_video_url ?? null,
+            'is_enrolled' => auth()->check() ? auth()->user()
                 ->enrollments()
                 ->where('course_id', $this->id)
                 ->whereNull('revoked_at')
@@ -44,7 +46,7 @@ class CourseDetailResource extends JsonResource
                 'bio' => $this->instructor->bio ?? null,
             ],
             'modules' => ModuleResource::collection($this->modules),
-            'promo_text' => 'প্রোমো কোড থাকলে কোর্সটি ১০০% ফ্রি', // static or from DB
+            'promo_text' => $this->promo_text ?? null,
         ];
     }
 }

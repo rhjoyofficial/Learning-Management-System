@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('image');
             $table->string('duration')->nullable();
             $table->decimal('price', 10, 2)->default(0);
+            $table->decimal('offer_price', 10, 2)->default(0);
             $table->boolean('is_paid')->default(false);
             $table->enum('level', ['beginner', 'intermediate', 'advanced']);
             $table->string('thumbnail')->nullable();

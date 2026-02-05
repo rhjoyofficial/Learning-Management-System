@@ -45,6 +45,19 @@ class CategorySeeder extends Seeder
                     ['name' => 'ওয়ার্কশপ', 'slug' => 'workshops'],
                 ],
             ],
+            [
+                'name' => 'ইসলামিক শিক্ষা',
+                'slug' => 'islamic-education',
+                'children' => [
+                    ['name' => 'কুরআন শিক্ষা', 'slug' => 'quran-education'],
+                    ['name' => 'হাদিস ও সীরাত', 'slug' => 'hadith-seerat'],
+                    ['name' => 'ফিকহ ও আকীদাহ', 'slug' => 'fiqh-aqidah'],
+                ],
+            ],
+            [
+                'name' => 'রমজান ক্যাম্পেইন',
+                'slug' => 'ramadan-campaigns',
+            ],
         ];
 
         foreach ($categories as $parent) {
@@ -52,13 +65,14 @@ class CategorySeeder extends Seeder
                 'name' => $parent['name'],
                 'slug' => $parent['slug'],
             ]);
-
-            foreach ($parent['children'] as $child) {
-                Category::create([
-                    'name' => $child['name'],
-                    'slug' => $child['slug'],
-                    'parent_id' => $parentCategory->id,
-                ]);
+            if (isset($parent['children'])) {
+                foreach ($parent['children'] as $child) {
+                    Category::create([
+                        'name' => $child['name'],
+                        'slug' => $child['slug'],
+                        'parent_id' => $parentCategory->id,
+                    ]);
+                }
             }
         }
     }

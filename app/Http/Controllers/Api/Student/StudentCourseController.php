@@ -20,12 +20,22 @@ class StudentCourseController extends Controller
             ], 403);
         }
 
+        // Ensure course is accessible by time window
+        if (! $course->isAccessibleNow()) {
+            return response()->json([
+                'message' => 'This course is not accessible at this time.',
+                'start_at' => $course->start_at,
+                'end_at' => $course->end_at,
+            ], 403);
+        }
+
         $course->load([
             'modules.lessons' => function ($q) {
                 $q->orderBy('position');
             },
             'instructor:id,name',
         ]);
+        $isCourseAccessible = $course->isAccessibleNow();
 
         return response()->json([
             'course' => [
@@ -34,11 +44,11 @@ class StudentCourseController extends Controller
                 'description' => $course->description,
                 'instructor' => $course->instructor->name,
             ],
-            'modules' => $course->modules->map(function ($module) use ($user) {
+            'modules' => $course->modules->map(function ($module) use ($user, $isCourseAccessible) {
                 return [
                     'id' => $module->id,
                     'title' => $module->title,
-                    'lessons' => $module->lessons->map(function ($lesson) use ($user) {
+                    'lessons' => $module->lessons->map(function ($lesson) use ($user, $isCourseAccessible) {
                         $progress = $user->lessonProgress()
                             ->where('lesson_id', $lesson->id)
                             ->first();
@@ -48,7 +58,7 @@ class StudentCourseController extends Controller
                             'title' => $lesson->title,
                             'is_free' => $lesson->is_free,
                             'is_completed' => (bool) $progress?->completed_at,
-                            'is_locked' => ! $lesson->is_free && ! $progress,
+                            'is_locked' => ! $isCourseAccessible,
                         ];
                     }),
                 ];
@@ -74,6 +84,40 @@ class StudentCourseController extends Controller
                 'video_url' => $lesson->video_url,
                 'duration' => $lesson->duration,
             ],
+        ]);
+    }
+
+    public function resume(Request $request, Course $course)
+    {
+        $user = $request->user();
+
+        if (! $user->isEnrolledIn($course)) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Last watched lesson
+        $lastProgress = $user->lessonProgress()
+            ->whereHas(
+                'lesson.module',
+                fn($q) =>
+                $q->where('course_id', $course->id)
+            )
+            ->latest('updated_at')
+            ->first();
+
+        if ($lastProgress) {
+            return response()->json([
+                'lesson_id' => $lastProgress->lesson_id,
+            ]);
+        }
+
+        // Fallback: first unlocked lesson
+        $lesson = $course->modules()
+            ->with(['lessons' => fn($q) => $q->where('is_free', true)])
+            ->first()?->lessons->first();
+
+        return response()->json([
+            'lesson_id' => $lesson?->id,
         ]);
     }
 }
