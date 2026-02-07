@@ -36,16 +36,17 @@ class CourseSeeder extends Seeder
             'level' => 'advanced',
             'status' => 'published',
             'promo_text' => 'প্রোমো কোড থাকলে কোর্সটি ১০০% ফ্রি',
-            'start_at' => Carbon::now(),
+            'note' => 'প্রোমো কোডের মেয়াদ :  ঈদের দিন রাত ১১.৫৯ টা পর্যন্ত',
+            'start_at' => Carbon::now()->addDays(7),
             'end_at' => Carbon::now()->addMonths(3),
         ]);
 
         $courses = [
-            ['ট্র্যাকার ভিডিও ট্রেনিং (রেকর্ডেড)', 'Tracker Video Training', 'দৈনিক অভ্যাস, লক্ষ্য অর্জন ও নিজের অগ্রগতি পর্যবেক্ষণের জন্য একটি সহজ ও কার্যকর ভিডিও ট্রেনিং প্রোগ্রাম।', '/images/tracker-video.png', '১ দিন', 0, false, 'প্রোমো কোড থাকলে কোর্সটি ১০০% ফ্রি'],
+            ['রূপান্তরের ৩০ দিন (Ramadan Transformation Tracker)', 'Ramadan Transformation Tracker Video Training', 'দৈনিক অভ্যাস, লক্ষ্য অর্জন ও নিজের অগ্রগতি পর্যবেক্ষণের জন্য একটি সহজ ও কার্যকর ভিডিও ট্রেনিং প্রোগ্রাম।', '/images/tracker-video.png', '১ দিন', 0, false, 'ভিডিও গাইডলাইন ফ্রি এক্সেস (ট্র্যাকার বইয়ের সাথে অন্তর্ভুক্ত)'],
             // ['আত্মিক উন্নয়ন কোর্স', 'মানসিক প্রশান্তি, আত্মনিয়ন্ত্রণ ও জীবনের উদ্দেশ্য খুঁজে পেতে একটি ধীর কিন্তু গভীর আত্মিক যাত্রা।', '/images/spiritual-course.jpg', '৮ সপ্তাহ', 3999, true],
         ];
 
-        foreach ($courses as [$title_bn, $title, $description, $img, $duration, $price, $paid, $promo_text]) {
+        foreach ($courses as [$title_bn, $title, $description, $img, $duration, $price, $paid, $note]) {
             Course::create([
                 'instructor_id' => $instructor->where('email', 'cmmoin@gmail.com')->first()->id,
                 'category_id' => $category->where('slug', 'ramadan-campaigns')->first()->id,
@@ -56,7 +57,7 @@ class CourseSeeder extends Seeder
                 'duration' => $duration,
                 'price' => $price,
                 'is_paid' => $paid,
-                'promo_text' => $promo_text,
+                'note' => $note ?? null,
                 'level' => 'beginner',
                 'status' => 'published',
                 'demo_video_url' => 'https://www.youtube.com/embed/tBbdSzwxqyY?si=huPcxXyTUk8u3ZJ9',

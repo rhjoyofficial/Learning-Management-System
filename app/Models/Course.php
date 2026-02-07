@@ -26,6 +26,8 @@ class Course extends Model
         'level',
         'thumbnail',
         'demo_video_url',
+        'note',
+        'promo_text',
         'status',
         'start_at',
         'end_at',
