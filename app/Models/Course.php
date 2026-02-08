@@ -26,6 +26,8 @@ class Course extends Model
         'level',
         'thumbnail',
         'demo_video_url',
+        'note',
+        'promo_text',
         'status',
         'start_at',
         'end_at',
@@ -67,19 +69,66 @@ class Course extends Model
         return $this->hasMany(Review::class);
     }
 
+    /**
+     * Check if the course is currently accessible based on start_at and end_at
+     */
     public function isAccessibleNow(): bool
     {
         $now = now();
 
-        if ($this->start_at && $now->lt($this->start_at)) {
+        // If no start_at is set, course is accessible
+        if (!$this->start_at) {
+            return true;
+        }
+
+        // Check if current time is after start_at
+        $hasStarted = $now->greaterThanOrEqualTo($this->start_at);
+
+        // If no end_at is set, only check start_at
+        if (!$this->end_at) {
+            return $hasStarted;
+        }
+
+        // Check if current time is before end_at
+        $hasNotEnded = $now->lessThanOrEqualTo($this->end_at);
+
+        return $hasStarted && $hasNotEnded;
+    }
+
+    /**
+     * Check if course hasn't started yet
+     */
+    public function isUpcoming(): bool
+    {
+        if (!$this->start_at) {
             return false;
         }
 
-        if ($this->end_at && $now->gt($this->end_at)) {
+        return now()->lessThan($this->start_at);
+    }
+
+    /**
+     * Check if course has ended
+     */
+    public function hasEnded(): bool
+    {
+        if (!$this->end_at) {
             return false;
         }
 
-        return true;
+        return now()->greaterThan($this->end_at);
+    }
+
+    /**
+     * Get seconds until course starts (0 if already started)
+     */
+    public function getSecondsUntilStart(): int
+    {
+        if (!$this->start_at || !$this->isUpcoming()) {
+            return 0;
+        }
+
+        return now()->diffInSeconds($this->start_at, false);
     }
 
     public function hasDemoVideo(): bool

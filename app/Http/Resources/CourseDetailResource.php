@@ -28,6 +28,8 @@ class CourseDetailResource extends JsonResource
             'enrollments_count' => $this->enrollments_count,
             'has_demo_video' => $this->hasDemoVideo(),
             'demo_video_url' => $this->demo_video_url ?? null,
+            'promo_text' => $this->promo_text ?? null,
+            'note' => $this->note ?? null,
             'is_enrolled' => auth()->check() ? auth()->user()
                 ->enrollments()
                 ->where('course_id', $this->id)
@@ -46,7 +48,6 @@ class CourseDetailResource extends JsonResource
                 'bio' => $this->instructor->bio ?? null,
             ],
             'modules' => ModuleResource::collection($this->modules),
-            'promo_text' => $this->promo_text ?? null,
         ];
     }
 }

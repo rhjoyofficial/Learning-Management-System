@@ -14,35 +14,43 @@ class StudentCourseController extends Controller
         $user = $request->user();
 
         // Ensure enrolled
-        if (! $user->isEnrolledIn($course)) {
+        if (!$user->isEnrolledIn($course)) {
             return response()->json([
                 'message' => 'You are not enrolled in this course',
             ], 403);
         }
 
-        // Ensure course is accessible by time window
-        if (! $course->isAccessibleNow()) {
+        $isCourseAccessible = $course->isAccessibleNow();
+
+        // If course is not accessible, return locked status with timing info
+        if (!$isCourseAccessible) {
             return response()->json([
+                'locked' => true,
                 'message' => 'This course is not accessible at this time.',
                 'start_at' => $course->start_at,
                 'end_at' => $course->end_at,
+                'is_upcoming' => $course->isUpcoming(),
+                'has_ended' => $course->hasEnded(),
             ], 403);
         }
 
+        // Load course data
         $course->load([
             'modules.lessons' => function ($q) {
                 $q->orderBy('position');
             },
             'instructor:id,name',
         ]);
-        $isCourseAccessible = $course->isAccessibleNow();
 
         return response()->json([
+            'locked' => false,
             'course' => [
                 'id' => $course->id,
                 'title' => $course->title,
                 'description' => $course->description,
                 'instructor' => $course->instructor->name,
+                'start_at' => $course->start_at,
+                'end_at' => $course->end_at,
             ],
             'modules' => $course->modules->map(function ($module) use ($user, $isCourseAccessible) {
                 return [
@@ -58,7 +66,7 @@ class StudentCourseController extends Controller
                             'title' => $lesson->title,
                             'is_free' => $lesson->is_free,
                             'is_completed' => (bool) $progress?->completed_at,
-                            'is_locked' => ! $isCourseAccessible,
+                            'is_locked' => !$isCourseAccessible,
                         ];
                     }),
                 ];
@@ -71,9 +79,19 @@ class StudentCourseController extends Controller
         $user = $request->user();
         $course = $lesson->module->course;
 
-        if (! $user->isEnrolledIn($course) && ! $lesson->is_free) {
+        // Check enrollment
+        if (!$user->isEnrolledIn($course) && !$lesson->is_free) {
             return response()->json([
                 'message' => 'Lesson is locked',
+            ], 403);
+        }
+
+        // Check course accessibility
+        if (!$course->isAccessibleNow()) {
+            return response()->json([
+                'message' => 'This course is not accessible at this time.',
+                'start_at' => $course->start_at,
+                'end_at' => $course->end_at,
             ], 403);
         }
 
@@ -91,16 +109,24 @@ class StudentCourseController extends Controller
     {
         $user = $request->user();
 
-        if (! $user->isEnrolledIn($course)) {
+        if (!$user->isEnrolledIn($course)) {
             return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Check course accessibility
+        if (!$course->isAccessibleNow()) {
+            return response()->json([
+                'message' => 'This course is not accessible at this time.',
+                'start_at' => $course->start_at,
+                'end_at' => $course->end_at,
+            ], 403);
         }
 
         // Last watched lesson
         $lastProgress = $user->lessonProgress()
             ->whereHas(
                 'lesson.module',
-                fn($q) =>
-                $q->where('course_id', $course->id)
+                fn($q) => $q->where('course_id', $course->id)
             )
             ->latest('updated_at')
             ->first();
@@ -113,8 +139,9 @@ class StudentCourseController extends Controller
 
         // Fallback: first unlocked lesson
         $lesson = $course->modules()
-            ->with(['lessons' => fn($q) => $q->where('is_free', true)])
+            ->with(['lessons' => fn($q) => $q->orderBy('position')])
             ->first()?->lessons->first();
+
 
         return response()->json([
             'lesson_id' => $lesson?->id,
