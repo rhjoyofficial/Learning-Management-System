@@ -12,7 +12,11 @@ class StudentDashboardController extends Controller
         $user = $request->user();
 
         $enrollments = $user->enrollments()
-            ->with(['course' => fn($q) => $q->withCount('modules')])
+            ->with([
+                'course' => fn($q) => $q->withCount('modules'),
+                'course.instructor:id,name',
+                'course.modules.lessons'
+            ])
             ->get();
 
         $totalWatchTime = $user->lessonProgress()->sum('watched_duration') ?? 0;
@@ -37,9 +41,8 @@ class StudentDashboardController extends Controller
                         ? round(($completedModules / $totalModules) * 100)
                         : 0
                 ],
-
             ],
-            'courses' => $enrollments->map(function ($enrollment) {
+            'courses' => $enrollments->map(function ($enrollment) use ($user) {
                 $course = $enrollment->course;
 
                 return [
@@ -47,13 +50,22 @@ class StudentDashboardController extends Controller
                     'title' => $course->title,
                     'thumbnail' => $course->thumbnail_url ?? null,
                     'image' => $course->image ?? null,
-                    'completed_modules' => $enrollment->completed_modules_count,
+                    'instructor' => [
+                        'name' => $course->instructor->name ?? 'Unknown',
+                    ],
+                    'completed_modules' => $enrollment->completed_modules_count ?? 0,
                     'total_modules' => $course->modules->count(),
                     'progress_percent' => $enrollment->progress_percent ?? (
                         $course->modules->count() > 0
                         ? round(($enrollment->completed_modules_count / $course->modules->count()) * 100)
                         : 0
                     ),
+                    // ADD THESE FIELDS FOR COURSE LOCKING
+                    'start_at' => $course->start_at,
+                    'end_at' => $course->end_at,
+                    'is_accessible' => $course->isAccessibleNow(),
+                    'is_upcoming' => $course->isUpcoming(),
+                    'has_ended' => $course->hasEnded(),
                 ];
             }),
         ]);
