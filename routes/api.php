@@ -21,17 +21,17 @@ use App\Http\Controllers\Api\Student\StudentDashboardController;
 use App\Http\Controllers\Api\Student\StudentCourseController;
 
 // Public Auth Routes
-Route::middleware('web')->prefix('auth')->group(function () {
+Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
-    Route::get('/me', [AuthController::class, 'me'])->middleware('auth');
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 });
 
 // Protected Routes
-Route::middleware('auth')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     // RBAC Routes
-    Route::middleware(['auth', 'role:student'])->prefix('student')->group(function () {
+    Route::middleware(['role:student'])->prefix('student')->group(function () {
         // Dashboard
         Route::get('/dashboard', [StudentDashboardController::class, 'index']);
 
@@ -58,44 +58,44 @@ Route::prefix('public')->group(function () {
     Route::get('/courses/{slug}', [CourseController::class, 'show']);
 });
 
-Route::middleware(['auth', 'role:instructor'])->prefix('instructor')->group(function () {
+Route::middleware(['auth:sanctum', 'role:instructor'])->prefix('instructor')->group(function () {
     Route::get('/courses', [InstructorCourseController::class, 'index']);
     Route::get('/courses/{course}', [InstructorCourseController::class, 'show']);
     Route::post('/courses', [InstructorCourseController::class, 'store']);
     Route::put('/courses/{course}', [InstructorCourseController::class, 'update']);
 });
 
-Route::middleware(['auth', 'role:student'])->prefix('student')->group(function () {
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(function () {
     Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'store']);
     Route::get('/enrollments', [EnrollmentController::class, 'index']);
 });
 
-Route::middleware(['auth', 'role:student'])->prefix('student')->group(function () {
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(function () {
     Route::post('/lessons/{lesson}/progress', [ProgressController::class, 'update']);
     Route::get('/courses/{course}/progress', [ProgressController::class, 'show']);
 });
 
-Route::middleware(['auth', 'role:student'])->prefix('student')->group(function () {
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(function () {
     Route::post('/courses/{course}/certificate', [CertificateController::class, 'generate']);
     Route::get('/courses/{course}/certificate', [CertificateController::class, 'show']);
 });
 
 Route::get('/verify/certificates/{certificate_number}', [CertificateVerificationController::class, 'verify']);
 
-Route::middleware(['auth', 'role:student'])->prefix('student')->group(function () {
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(function () {
     Route::post('/courses/{course}/checkout', [CheckoutController::class, 'checkout']);
     Route::get('/payments', fn(Request $r) => $r->user()->payments()->latest()->get());
 });
 
 Route::post('/payments/webhook', [PaymentWebhookController::class, 'handle']);
 
-Route::middleware(['auth', 'role:student'])->prefix('student')->group(function () {
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(function () {
     Route::post('/courses/{course}/checkout', [SSLCommerzCheckoutController::class, 'checkout']);
 });
 
 Route::post('/payments/sslcommerz/ipn', [SSLCommerzIPNController::class, 'handle']);
 
-Route::middleware(['auth', 'role:student'])->prefix('student')->group(function () {
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student')->group(function () {
     Route::post('/courses/{course}/bkash/checkout', [BkashCheckoutController::class, 'checkout']);
 });
 
