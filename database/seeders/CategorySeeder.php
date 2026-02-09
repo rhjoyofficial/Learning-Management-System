@@ -11,6 +11,15 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             [
+                'name' => 'ইসলামিক শিক্ষা',
+                'slug' => 'islamic-education',
+                'children' => [
+                    ['name' => 'কুরআন শিক্ষা', 'slug' => 'quran-education'],
+                    ['name' => 'হাদিস ও সীরাত', 'slug' => 'hadith-seerat'],
+                    ['name' => 'ফিকহ ও আকীদাহ', 'slug' => 'fiqh-aqidah'],
+                ],
+            ],
+            [
                 'name' => 'ব্যক্তিগত উন্নয়ন',
                 'slug' => 'personal-development',
                 'children' => [
@@ -46,16 +55,7 @@ class CategorySeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'ইসলামিক শিক্ষা',
-                'slug' => 'islamic-education',
-                'children' => [
-                    ['name' => 'কুরআন শিক্ষা', 'slug' => 'quran-education'],
-                    ['name' => 'হাদিস ও সীরাত', 'slug' => 'hadith-seerat'],
-                    ['name' => 'ফিকহ ও আকীদাহ', 'slug' => 'fiqh-aqidah'],
-                ],
-            ],
-            [
-                'name' => 'রমজান ক্যাম্পেইন',
+                'name' => 'রমাদান ক্যাম্পেইন',
                 'slug' => 'ramadan-campaigns',
             ],
         ];

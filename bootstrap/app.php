@@ -14,10 +14,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append([
-            CustomCors::class,
-        ]);
 
+        // 🚫 REMOVE Laravel default CORS
+        $middleware->remove(\Illuminate\Http\Middleware\HandleCors::class);
+
+        // ✅ USE ONLY YOUR CORS
+        $middleware->append(CustomCors::class);
+
+        // Sanctum SPA
         $middleware->prependToGroup('api', [
             EnsureFrontendRequestsAreStateful::class,
         ]);
