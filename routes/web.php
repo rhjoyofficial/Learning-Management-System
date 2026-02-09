@@ -2,4 +2,4 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/sanctum/csrf-cookie', fn() => response()->noContent());
+Route::get('/sanctum/csrf-cookie', [\Laravel\Sanctum\Http\Controllers\CsrfCookieController::class, 'show']);
