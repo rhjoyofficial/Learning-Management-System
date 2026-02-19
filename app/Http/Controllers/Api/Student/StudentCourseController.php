@@ -66,7 +66,11 @@ class StudentCourseController extends Controller
                             'title' => $lesson->title,
                             'is_free' => $lesson->is_free,
                             'is_completed' => (bool) $progress?->completed_at,
-                            'is_locked' => !$isCourseAccessible,
+                            'is_locked' => !$isCourseAccessible || !$lesson->isAccessibleNow(),
+                            'start_at' => $lesson->start_at,
+                            'end_at' => $lesson->end_at,
+                            'is_upcoming' => $lesson->start_at && now()->lessThan($lesson->start_at),
+                            'has_ended' => $lesson->end_at && now()->greaterThan($lesson->end_at),
                         ];
                     }),
                 ];
@@ -92,6 +96,14 @@ class StudentCourseController extends Controller
                 'message' => 'This course is not accessible at this time.',
                 'start_at' => $course->start_at,
                 'end_at' => $course->end_at,
+            ], 403);
+        }
+
+        if (!$lesson->isAccessibleNow()) {
+            return response()->json([
+                'message' => 'This lesson is not accessible at this time.',
+                'start_at' => $lesson->start_at,
+                'end_at' => $lesson->end_at,
             ], 403);
         }
 
