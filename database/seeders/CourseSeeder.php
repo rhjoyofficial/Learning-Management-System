@@ -60,7 +60,7 @@ class CourseSeeder extends Seeder
                 'note' => $note ?? null,
                 'level' => 'beginner',
                 'status' => 'published',
-                'demo_video_url' => 'https://www.youtube.com/embed/tBbdSzwxqyY?si=huPcxXyTUk8u3ZJ9',
+                'demo_video_url' => 'https://www.youtube.com/embed/hkrBsG50ubs?si=YVHu52zln8_UTFUh',
                 'start_at' => now(),
                 'end_at' => now()->addYear(),
             ]);
