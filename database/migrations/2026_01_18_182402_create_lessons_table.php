@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('video_url');
             $table->unsignedInteger('duration')->default(0); // seconds
             $table->boolean('is_free')->default(false);
+            $table->timestamp('start_at')->nullable();
+            $table->timestamp('end_at')->nullable();
+
             $table->unsignedInteger('position');
             $table->timestamps();
         });
